@@ -17,7 +17,7 @@ fun main() {
     greetPerson(name = "Nate")
 
     println("====")
-    sayHello(greeting = "Hi", items = *interestingThings)
+    sayHello(greeting = "Hi", items = interestingThings)
 
     println("====")
     val person = Person()
@@ -33,4 +33,8 @@ fun main() {
 // Inheritance
 // Object expressions
 // Companion objects
+
 // Object declarations
+// Enum classes
+// Sealed classes
+// Data classes
