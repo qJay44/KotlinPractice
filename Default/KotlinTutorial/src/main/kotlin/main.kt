@@ -29,3 +29,8 @@ fun main() {
     println("====")
     person.printInfo()
 }
+
+// Inheritance
+// Object expressions
+// Companion objects
+// Object declarations
