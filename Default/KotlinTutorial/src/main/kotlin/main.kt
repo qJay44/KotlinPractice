@@ -38,3 +38,6 @@ fun main() {
 // Enum classes
 // Sealed classes
 // Data classes
+
+// Extension functions / properties
+// Advanced functions

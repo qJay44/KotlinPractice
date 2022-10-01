@@ -35,6 +35,13 @@ sealed class Entity3 () {
     data class Hard(val id: String, val name: String, val multiplier: Float) : Entity3()
 }
 
+fun Entity3.Medium.printInfo() {
+    println("Medium class: $id")
+}
+
+val Entity3.Medium.info: String
+    get() = "some info"
+
 fun main() {
     val entity: Entity3 = EntityFactory3.create(EntityType2.EASY)
     val msg = when(entity) {
@@ -54,5 +61,12 @@ fun main() {
         println("they are equal")
     } else {
         println("they are not equal")
+    }
+
+    println("====")
+    val entity3 = EntityFactory3.create(EntityType2.MEDIUM)
+    if (entity3 is Entity3.Medium) {
+        entity3.printInfo()
+        entity3.info
     }
 }
