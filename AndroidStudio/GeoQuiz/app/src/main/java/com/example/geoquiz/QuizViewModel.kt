@@ -1,6 +1,7 @@
 package com.example.geoquiz
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 
@@ -10,7 +11,6 @@ class QuizViewModel : ViewModel() {
         private const val TAG = "QuizViewModel"
     }
 
-    private var currentIndex = 0
     private var points = 0
     private val questionBank = listOf(
         Question(R.string.question_australia, true),
@@ -20,6 +20,8 @@ class QuizViewModel : ViewModel() {
         Question(R.string.question_americas, true),
         Question(R.string.question_asia, true)
     )
+    var currentIndex = 0
+    var isCheater = false
 
     val currentQuestionAnswer: Boolean
         get() = questionBank[currentIndex].answer
@@ -44,6 +46,7 @@ class QuizViewModel : ViewModel() {
         if (currentIndex == questionBank.size - 1) {
             val successRate = (points / questionBank.size * 100.0f)
             val message = if (successRate > 100.0f) "100%" else successRate.toString().plus("%")
+            Log.i(TAG, "Success rate: $message")
 
             Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show()
         }
