@@ -3,6 +3,7 @@ package com.example.geoquiz
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
@@ -24,6 +25,7 @@ class CheatActivity : AppCompatActivity() {
 
     private lateinit var answerTextView: TextView
     private lateinit var showAnswerButton: Button
+    private lateinit var apiLevel: TextView
     private var answerIsTrue = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,6 +35,8 @@ class CheatActivity : AppCompatActivity() {
         answerIsTrue = intent.getBooleanExtra(EXTRA_ANSWER_IS_TRUE, false)
         answerTextView = findViewById(R.id.answer_text_view)
         showAnswerButton = findViewById(R.id.show_answer_button)
+        apiLevel = findViewById(R.id.api_level_text)
+
         showAnswerButton.setOnClickListener {
             val answerText = when {
                 answerIsTrue -> R.string.true_button
@@ -41,6 +45,9 @@ class CheatActivity : AppCompatActivity() {
             answerTextView.setText(answerText)
             setAnswerShownResult(true)
         }
+
+        val apiLevelText = "API Level ${Build.VERSION.SDK_INT}"
+        apiLevel.text = apiLevelText
     }
 
     private fun setAnswerShownResult(isAnswerShown: Boolean) {

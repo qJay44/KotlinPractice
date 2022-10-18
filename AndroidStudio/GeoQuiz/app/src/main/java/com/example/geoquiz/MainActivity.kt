@@ -1,8 +1,7 @@
 package com.example.geoquiz
 
 import android.app.Activity
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.os.Build
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.util.Log
@@ -11,6 +10,8 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.ViewModelProvider
 
 class MainActivity : AppCompatActivity() {
@@ -73,9 +74,18 @@ class MainActivity : AppCompatActivity() {
         }
 
         cheatButton.setOnClickListener {
+            quizViewModel.availableHints--
             val answerIsTrue = quizViewModel.currentQuestionAnswer
             val intent = CheatActivity.newIntent(this@MainActivity, answerIsTrue)
-            scan.launch(intent)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                val options = ActivityOptionsCompat
+                    .makeClipRevealAnimation(it, 0, 0, it.width, it.height)
+
+                scan.launch(intent, options)
+            } else {
+                scan.launch(intent)
+            }
         }
 
         updateQuestion()
@@ -105,6 +115,10 @@ class MainActivity : AppCompatActivity() {
 
         trueButton.isEnabled = true
         falseButton.isEnabled = true
+
+        if (quizViewModel.availableHints == 0) {
+            cheatButton.isEnabled = false
+        }
     }
 
     private fun checkAnswer(userAnswer: Boolean) {
