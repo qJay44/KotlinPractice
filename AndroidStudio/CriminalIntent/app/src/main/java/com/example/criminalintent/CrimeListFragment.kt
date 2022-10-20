@@ -83,6 +83,7 @@ class CrimeListFragment : Fragment() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CrimeHolder {
             val view = layoutInflater.inflate(R.layout.list_item_crime, parent, false)
+
             return CrimeHolder(view)
         }
 
@@ -92,10 +93,5 @@ class CrimeListFragment : Fragment() {
         }
 
         override fun getItemCount(): Int = crimes.size
-
-        override fun getItemViewType(position: Int): Int {
-            Log.i(TAG, "getItemViewType: $position")
-            return super.getItemViewType(position)
-        }
     }
 }
