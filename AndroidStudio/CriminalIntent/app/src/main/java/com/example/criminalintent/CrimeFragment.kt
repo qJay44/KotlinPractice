@@ -10,8 +10,6 @@ import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import androidx.fragment.app.Fragment
-import java.text.SimpleDateFormat
-import java.util.*
 
 class CrimeFragment : Fragment() {
 
@@ -35,7 +33,6 @@ class CrimeFragment : Fragment() {
         titleField = view.findViewById(R.id.crime_title) as EditText
         dateButton = view.findViewById(R.id.crime_date) as Button
         solvedCheckBox = view.findViewById(R.id.crime_solved) as CheckBox
-
 
         dateButton.apply {
             text = crime.date.toString()
