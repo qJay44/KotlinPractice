@@ -11,7 +11,9 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import java.text.SimpleDateFormat
 import java.util.*
@@ -33,7 +35,7 @@ class CrimeListFragment : Fragment() {
 
     private var callbacks: Callbacks? = null
     private lateinit var crimeRecyclerView: RecyclerView
-    private var adapter: CrimeAdapter? = CrimeAdapter(emptyList())
+    private var adapter: CrimeAdapter? = CrimeAdapter()
 
     private val crimeListViewModel: CrimeListViewModel by lazy {
         ViewModelProvider(this)[CrimeListViewModel::class.java]
@@ -77,8 +79,7 @@ class CrimeListFragment : Fragment() {
     }
 
     private fun updateUI(crimes: List<Crime>) {
-        adapter = CrimeAdapter(crimes)
-        crimeRecyclerView.adapter = adapter
+        adapter?.submitList(crimes)
     }
 
     private inner class CrimeHolder(view: View)
@@ -108,7 +109,8 @@ class CrimeListFragment : Fragment() {
         }
     }
 
-    private inner class CrimeAdapter(var crimes: List<Crime>) : RecyclerView.Adapter<CrimeHolder>() {
+    private inner class CrimeAdapter
+        : ListAdapter<Crime, CrimeHolder>(DiffCallBack) {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CrimeHolder {
             val view = layoutInflater.inflate(R.layout.list_item_crime, parent, false)
@@ -117,10 +119,21 @@ class CrimeListFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: CrimeHolder, position: Int) {
-            val crime = crimes[position]
+            val crime = currentList[position]
             holder.bind(crime)
         }
 
-        override fun getItemCount(): Int = crimes.size
+        override fun getItemCount(): Int = currentList.size
+    }
+
+    private object DiffCallBack : DiffUtil.ItemCallback<Crime>() {
+
+        override fun areItemsTheSame(oldItem: Crime, newItem: Crime): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: Crime, newItem: Crime): Boolean {
+            return oldItem == newItem
+        }
     }
 }
