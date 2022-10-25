@@ -5,15 +5,12 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentResultListener
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import java.util.UUID
 
@@ -41,7 +38,6 @@ class CrimeFragment : Fragment(), FragmentResultListener {
     private lateinit var dateButton: Button
     private lateinit var solvedCheckBox: CheckBox
     private lateinit var timeButton: Button
-    private var tempTime = "00:00"
 
     private val crimeDetailViewModel: CrimeDetailViewModel by lazy {
         ViewModelProvider(this)[CrimeDetailViewModel::class.java]
@@ -76,15 +72,12 @@ class CrimeFragment : Fragment(), FragmentResultListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        crimeDetailViewModel.crimeLiveData.observe(
-            viewLifecycleOwner,
-            Observer { crime ->
-                crime?.let {
-                    this.crime = crime
-                    updateUI()
-                }
+        crimeDetailViewModel.crimeLiveData.observe(viewLifecycleOwner) { crime ->
+            crime?.let {
+                this.crime = crime
+                updateUI()
             }
-        )
+        }
         childFragmentManager.setFragmentResultListener(REQUEST_DATE, viewLifecycleOwner, this)
         childFragmentManager.setFragmentResultListener(REQUEST_TIME, viewLifecycleOwner, this)
     }
@@ -128,14 +121,14 @@ class CrimeFragment : Fragment(), FragmentResultListener {
     }
 
     override fun onFragmentResult(requestKey: String, result: Bundle) {
-        Log.i(TAG, "received result for $requestKey")
+        Log.d(TAG, "received result for $requestKey")
         when(requestKey) {
             REQUEST_DATE -> {
                 crime.date = DatePickerFragment.getSelectedDate(result)
                 updateUI()
             }
             REQUEST_TIME -> {
-                tempTime = TimePickerFragment.getSelectedTime(result)
+                crime.time = TimePickerFragment.getSelectedTime(result)
                 updateUI()
             }
         }
@@ -148,6 +141,6 @@ class CrimeFragment : Fragment(), FragmentResultListener {
             isChecked = crime.isSolved
             jumpDrawablesToCurrentState()
         }
-        timeButton.text = tempTime
+        timeButton.text = crime.time
     }
 }

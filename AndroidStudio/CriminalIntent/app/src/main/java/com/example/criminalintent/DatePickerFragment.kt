@@ -28,12 +28,10 @@ class DatePickerFragment : DialogFragment() {
 
         @Suppress("DEPRECATION")
         fun getSelectedDate(result: Bundle): Date {
-            val date: Date? =
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                    result.getSerializable(RESULT_DATE_KEY, Date::class.java)
-                else result.getSerializable(RESULT_DATE_KEY) as Date
 
-            return date!!
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                result.getSerializable(RESULT_DATE_KEY, Date::class.java)!!
+            else result.getSerializable(RESULT_DATE_KEY) as Date
         }
     }
 

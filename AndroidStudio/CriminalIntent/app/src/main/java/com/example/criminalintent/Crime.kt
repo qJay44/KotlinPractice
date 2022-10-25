@@ -11,4 +11,5 @@ data class Crime(
     var title: String = "",
     var date: Date = Date(),
     var isSolved: Boolean = false,
+    var time: String = "00:00"
 )
