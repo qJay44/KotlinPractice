@@ -3,6 +3,8 @@ package com.example.criminalintent
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.criminalintent.database.CrimeDatabase
 import java.util.UUID
 import java.util.concurrent.Executors
@@ -24,11 +26,19 @@ class CrimeRepository private constructor(context: Context){
         }
     }
 
+    private val migrationOneTwo = object : Migration(1, 2) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL(
+                "ALTER TABLE Crime ADD COLUMN suspect TEXT NOT NULL DEFAULT ''"
+            )
+        }
+    }
+
     private val database: CrimeDatabase = Room.databaseBuilder(
         context.applicationContext,
         CrimeDatabase::class.java,
         DATABASE_NAME
-    ).build()
+    ).addMigrations(migrationOneTwo).build()
 
     private val crimeDao = database.crimeDao()
     private val executor = Executors.newSingleThreadExecutor()
