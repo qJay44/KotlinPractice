@@ -1,8 +1,13 @@
 package com.example.criminalintent
 
+import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.text.Editable
 import android.text.TextWatcher
 import android.text.format.DateFormat
@@ -11,6 +16,8 @@ import android.view.*
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentResultListener
 import androidx.lifecycle.ViewModelProvider
@@ -23,6 +30,7 @@ class CrimeFragment : Fragment(), FragmentResultListener {
         private const val ARG_CRIME_ID = "crime_id"
         private const val REQUEST_DATE = "DialogDate"
         private const val REQUEST_TIME = "DialogTime"
+        private const val REQUEST_CONTACT = 1
         private const val DATE_FORMAT = "EEE, MMM, dd"
 
         fun newInstance(crimeId: UUID): CrimeFragment {
@@ -42,9 +50,35 @@ class CrimeFragment : Fragment(), FragmentResultListener {
     private lateinit var solvedCheckBox: CheckBox
     private lateinit var timeButton: Button
     private lateinit var reportButton: Button
+    private lateinit var suspectButton: Button
 
     private val crimeDetailViewModel: CrimeDetailViewModel by lazy {
         ViewModelProvider(this)[CrimeDetailViewModel::class.java]
+    }
+
+    private val pickContactResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data = result.data
+            val contactUri: Uri? = data?.data
+            // Указать, для каких полей ваш запрос должен возвращать значения.
+            val queryFields = arrayOf(ContactsContract.Contacts.DISPLAY_NAME)
+            // Выполняемый здесь запрос — contactUri похож на предложение "where"
+            val cursor = requireActivity().contentResolver
+                .query(contactUri!!, queryFields, null, null, null)
+            cursor?.use {
+                // Verify cursor contains at least one result
+                if (it.count == 0) {
+                    return@use
+                }
+                // Первый столбец первой строки данных —
+                // это имя вашего подозреваемого.
+                it.moveToFirst()
+                val suspect = it.getString(0)
+                crime.suspect = suspect
+                crimeDetailViewModel.saveCrime(crime)
+                suspectButton.text = suspect   //
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,6 +105,7 @@ class CrimeFragment : Fragment(), FragmentResultListener {
         solvedCheckBox = view.findViewById(R.id.crime_solved) as CheckBox
         timeButton = view.findViewById(R.id.crime_time) as Button
         reportButton = view.findViewById(R.id.crime_report) as Button
+        suspectButton = view.findViewById(R.id.crime_suspect) as Button
 
         return view
     }
@@ -128,6 +163,36 @@ class CrimeFragment : Fragment(), FragmentResultListener {
                 val chooserIntent = Intent.createChooser(intent, getString(R.string.send_report))
                 startActivity(chooserIntent) }
         }
+
+        suspectButton.apply {
+            val pickContactIntent =
+                Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
+
+            setOnClickListener {
+                pickContactResult.launch(pickContactIntent)
+            }
+
+//            pickContactIntent.addCategory(Intent.CATEGORY_HOME)
+            val packageManager: PackageManager = requireActivity().packageManager
+
+            @Suppress("DEPRECATION")
+            val resolvedActivity: ResolveInfo? =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    packageManager.resolveActivity(pickContactIntent,
+                        PackageManager.ResolveInfoFlags.of(
+                            PackageManager.MATCH_DEFAULT_ONLY.toLong()
+                        )
+                    )
+                } else {
+                    packageManager.resolveActivity(
+                        pickContactIntent, PackageManager.MATCH_DEFAULT_ONLY
+                    )
+                }
+
+            if (resolvedActivity == null) {
+                isEnabled = false
+            }
+        }
     }
 
     override fun onStop() {
@@ -157,6 +222,8 @@ class CrimeFragment : Fragment(), FragmentResultListener {
             jumpDrawablesToCurrentState()
         }
         timeButton.text = crime.time
+
+        if (crime.suspect.isNotEmpty()) suspectButton.text = crime.suspect
     }
 
     private fun getCrimeReport(): String {
