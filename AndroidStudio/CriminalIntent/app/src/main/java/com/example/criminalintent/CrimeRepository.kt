@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.criminalintent.database.CrimeDatabase
+import java.io.File
 import java.util.UUID
 import java.util.concurrent.Executors
 
@@ -42,6 +43,7 @@ class CrimeRepository private constructor(context: Context){
 
     private val crimeDao = database.crimeDao()
     private val executor = Executors.newSingleThreadExecutor()
+    private val filesDir = context.applicationContext.filesDir
 
     fun getCrimes(): LiveData<List<Crime>> = crimeDao.getCrimes()
 
@@ -58,4 +60,6 @@ class CrimeRepository private constructor(context: Context){
             crimeDao.addCrime(crime)
         }
     }
+
+    fun getPhotoFile(crime: Crime): File = File(filesDir, crime.photoFileName)
 }

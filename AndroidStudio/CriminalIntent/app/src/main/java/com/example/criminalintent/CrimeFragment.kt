@@ -16,6 +16,8 @@ import android.view.*
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.ImageView
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
@@ -30,7 +32,6 @@ class CrimeFragment : Fragment(), FragmentResultListener {
         private const val ARG_CRIME_ID = "crime_id"
         private const val REQUEST_DATE = "DialogDate"
         private const val REQUEST_TIME = "DialogTime"
-        private const val REQUEST_CONTACT = 1
         private const val DATE_FORMAT = "EEE, MMM, dd"
 
         fun newInstance(crimeId: UUID): CrimeFragment {
@@ -51,6 +52,8 @@ class CrimeFragment : Fragment(), FragmentResultListener {
     private lateinit var timeButton: Button
     private lateinit var reportButton: Button
     private lateinit var suspectButton: Button
+    private lateinit var photoButton: ImageButton
+    private lateinit var photoView: ImageView
 
     private val crimeDetailViewModel: CrimeDetailViewModel by lazy {
         ViewModelProvider(this)[CrimeDetailViewModel::class.java]
@@ -106,6 +109,8 @@ class CrimeFragment : Fragment(), FragmentResultListener {
         timeButton = view.findViewById(R.id.crime_time) as Button
         reportButton = view.findViewById(R.id.crime_report) as Button
         suspectButton = view.findViewById(R.id.crime_suspect) as Button
+        photoButton = view.findViewById(R.id.crime_camera) as ImageButton
+        photoView = view.findViewById(R.id.crime_photo) as ImageView
 
         return view
     }
