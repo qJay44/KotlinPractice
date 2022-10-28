@@ -16,7 +16,7 @@ class TimePickerFragment : DialogFragment() {
         private const val ARG_REQUEST_CODE = "requestCode"
         private const val RESULT_TIME_KEY = "resultTimeKey"
 
-        // Pack received date
+        // Pack received date and return new instance
         fun newInstance(date: Date, requestCode: String): TimePickerFragment {
             val args = Bundle().apply {
                 putSerializable(ARG_TIME, date)
@@ -31,7 +31,6 @@ class TimePickerFragment : DialogFragment() {
         // Send dialog result
         @Suppress("DEPRECATION")
         fun getSelectedTime(result: Bundle): String {
-
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
                 result.getSerializable(RESULT_TIME_KEY, String::class.java)!!
             else result.getSerializable(RESULT_TIME_KEY) as String

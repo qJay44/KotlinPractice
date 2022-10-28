@@ -1,5 +1,6 @@
 package com.example.criminalintent
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -194,6 +195,19 @@ class CrimeFragment : Fragment(), FragmentResultListener {
                 startActivity(chooserIntent) }
         }
 
+        photoView.setOnClickListener {
+            val zoomDialog = ZoomDialogFragment.newInstance(crime.photoFileName)
+            zoomDialog.show(childFragmentManager, null)
+        }
+
+        photoView.viewTreeObserver.apply {
+            if (isAlive) {
+                addOnGlobalLayoutListener {
+                    updatePhotoView()
+                }
+            }
+        }
+
         suspectButton.apply {
             val pickContactIntent =
                 Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
@@ -241,11 +255,14 @@ class CrimeFragment : Fragment(), FragmentResultListener {
                 } else {
                     packageManager.resolveActivity(captureImage, PackageManager.MATCH_DEFAULT_ONLY)
                 }
+
             if (resolvedActivity == null) isEnabled = false
 
             setOnClickListener {
                 captureImage.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
 
+                @Suppress("DEPRECATION")
+                @SuppressLint("QueryPermissionsNeeded")
                 val cameraActivities: List<ResolveInfo> =
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         packageManager.queryIntentActivities(
@@ -314,7 +331,7 @@ class CrimeFragment : Fragment(), FragmentResultListener {
 
     private fun updatePhotoView() {
         if (photoFile.exists()) {
-            val bitmap = getScaledBitmap(photoFile.path, requireActivity())
+            val bitmap = getScaledBitmap(photoFile.path, photoView.width, photoView.height)
             photoView.setImageBitmap(bitmap)
         } else {
             photoView.setImageDrawable(null)
