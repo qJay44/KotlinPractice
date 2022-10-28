@@ -61,6 +61,8 @@ class CrimeFragment : Fragment(), FragmentResultListener {
     private lateinit var crime: Crime
     private lateinit var photoFile: File
     private lateinit var photoUri: Uri
+    private var viewWidth = 0
+    private var viewHeight = 0
 
     private val crimeDetailViewModel: CrimeDetailViewModel by lazy {
         ViewModelProvider(this)[CrimeDetailViewModel::class.java]
@@ -132,6 +134,12 @@ class CrimeFragment : Fragment(), FragmentResultListener {
         photoButton = view.findViewById(R.id.crime_camera) as ImageButton
         photoView = view.findViewById(R.id.crime_photo) as ImageView
 
+        val treeObserver = photoView.viewTreeObserver
+        treeObserver.addOnGlobalLayoutListener {
+            viewWidth = photoView.width
+            viewHeight = photoView.height
+        }
+
         return view
     }
 
@@ -198,14 +206,6 @@ class CrimeFragment : Fragment(), FragmentResultListener {
         photoView.setOnClickListener {
             val zoomDialog = ZoomDialogFragment.newInstance(crime.photoFileName)
             zoomDialog.show(childFragmentManager, null)
-        }
-
-        photoView.viewTreeObserver.apply {
-            if (isAlive) {
-                addOnGlobalLayoutListener {
-                    updatePhotoView()
-                }
-            }
         }
 
         suspectButton.apply {
@@ -327,11 +327,13 @@ class CrimeFragment : Fragment(), FragmentResultListener {
         timeButton.text = crime.time
 
         if (crime.suspect.isNotEmpty()) suspectButton.text = crime.suspect
+
+        updatePhotoView()
     }
 
     private fun updatePhotoView() {
         if (photoFile.exists()) {
-            val bitmap = getScaledBitmap(photoFile.path, photoView.width, photoView.height)
+            val bitmap = getScaledBitmap(photoFile.path, viewWidth, viewHeight)
             photoView.setImageBitmap(bitmap)
         } else {
             photoView.setImageDrawable(null)
