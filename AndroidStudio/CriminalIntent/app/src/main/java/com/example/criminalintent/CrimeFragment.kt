@@ -14,12 +14,10 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.text.format.DateFormat
 import android.util.Log
-import android.view.*
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.ImageView
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.*
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
@@ -27,7 +25,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentResultListener
 import androidx.lifecycle.ViewModelProvider
 import java.io.File
-import java.util.UUID
+import java.util.*
 
 class CrimeFragment : Fragment(), FragmentResultListener {
 
@@ -36,7 +34,6 @@ class CrimeFragment : Fragment(), FragmentResultListener {
         private const val ARG_CRIME_ID = "crime_id"
         private const val REQUEST_DATE = "DialogDate"
         private const val REQUEST_TIME = "DialogTime"
-        private const val DATE_FORMAT = "EEE, MMM, dd"
 
         fun newInstance(crimeId: UUID): CrimeFragment {
             val args = Bundle().apply {
@@ -317,9 +314,15 @@ class CrimeFragment : Fragment(), FragmentResultListener {
         }
     }
 
+    private fun getLocaleDate(date: Date): String {
+        val df = DateFormat.getDateFormat(requireContext())
+
+        return df.format(date)
+    }
+
     private fun updateUI() {
         titleField.setText(crime.title)
-        dateButton.text = crime.date.toString()
+        dateButton.text = getLocaleDate(crime.date)
         solvedCheckBox.apply {
             isChecked = crime.isSolved
             jumpDrawablesToCurrentState()
@@ -346,7 +349,7 @@ class CrimeFragment : Fragment(), FragmentResultListener {
         } else {
             getString(R.string.crime_report_unsolved)
         }
-        val dateString = DateFormat.format(DATE_FORMAT, crime.date).toString()
+        val dateString = getLocaleDate(crime.date)
         val suspect = if (crime.suspect.isBlank()) {
             getString(R.string.crime_report_no_suspect)
         } else {
