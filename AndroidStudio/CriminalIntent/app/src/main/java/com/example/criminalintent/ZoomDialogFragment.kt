@@ -31,7 +31,8 @@ class ZoomDialogFragment : DialogFragment() {
         val view = inflater.inflate(R.layout.zoom_layout, container, false)
         val imageView = view.findViewById(R.id.zoom_image_view) as ImageView
 
-        @Suppress("DEPRECATION") val photoFileName =
+        @Suppress("DEPRECATION")
+        val photoFileName =
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
                 arguments?.getSerializable(PHOTO_URI, String::class.java)!!
             else arguments?.getSerializable(PHOTO_URI) as String
